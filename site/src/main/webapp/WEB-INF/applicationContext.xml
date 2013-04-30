@@ -175,4 +175,11 @@
             </list>
         </property>
     </bean>
+     <bean id="blAbstractBaseProcessorExtensionManager" class="org.broadleafcommerce.core.offer.service.processor.AbstractBaseProcessorExtensionManager">
+        <property name="listeners">
+            <list>
+                <bean class="com.broadleafcommerce.advancedoffer.extension.AdvancedOfferAbstractBaseProcessorExtensionListener" />
+            </list>
+        </property>
+    </bean>
 </beans>
