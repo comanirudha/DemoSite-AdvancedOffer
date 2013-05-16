@@ -8,12 +8,19 @@
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
     
     <property name="project.root" location="../../"/>
+    <property name="project.name" value="site" />
     
-    <!-- Read a user defined (.build.propertes) property file(if any) from the home directory-->
+	<!-- See the following URL for a description of this property file strategy -->
+	<!-- The only difference is we prepend a . for the home directory property files -->
+	<!-- http://www.javaranch.com/ant/properties.jsp -->
+	<property file="${user.home}/.${project.name}.properties"/>
     <property file="${user.home}/.build.properties"/>
-    
+    <property name="config.filename" value="${user.name}.properties"/>
+    <property file="config/${config.filename}"/>
     <property file="../build.properties"/>
-    
+	
+	<property name="runtime.environment" value="development"/>
+	
     <target name="jetty-demo-no-db">
             <delete dir="war/WEB-INF/lib"/>
             <artifact:mvn mavenHome="${maven.home}" fork="true">
@@ -21,7 +28,8 @@
                 <jvmarg value="-Xmx512M" />
                 <jvmarg value="-Xdebug" />
                 <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n" />
-                <jvmarg value="-javaagent:${spring.instrument.path}" />
+            	<jvmarg value="-Druntime.environment=${runtime.environment}" />
+            <jvmarg value="-javaagent:${spring.instrument.path}" />     
                 <arg value="compile"/>
                 <arg value="war:exploded"/>
                 <arg value="jetty:run"/>
@@ -35,7 +43,8 @@
             <jvmarg value="-Xmx512M" />
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n" />
-            <jvmarg value="-javaagent:${spring.instrument.path}" />
+            <jvmarg value="-Druntime.environment=${runtime.environment}" />
+            <jvmarg value="-javaagent:${spring.instrument.path}" />  
             <arg value="compile"/>
             <arg value="war:exploded"/>
             <arg value="jetty:run"/>
@@ -53,7 +62,8 @@
             <jvmarg value="-Dlogs.dir=${logs.dir}" />
             <jvmarg value="-noverify" />
             <jvmarg value="-javaagent:${jrebel.path}" />
-            <jvmarg value="-javaagent:${spring.instrument.path}" />
+            <jvmarg value="-Druntime.environment=${runtime.environment}" />
+            <jvmarg value="-javaagent:${spring.instrument.path}" />  
             <arg value="compile"/>
             <arg value="war:exploded"/>
             <arg value="jetty:run"/>
@@ -67,6 +77,8 @@
             <arg value="jetty:stop"/>
         </artifact:mvn>
     </target>
+	
+	<target name="stop-all" depends="jetty-stop, stop-db"/>
     
     <!-- Project Reference Targets -->
     <!-- build the application and create the war artifact -->
